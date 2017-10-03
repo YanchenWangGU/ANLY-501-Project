@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import numpy as np
 
 locList = list()
 # Location at national arboretum
@@ -62,8 +63,8 @@ for i in range(len(dateList)):
         
 df.to_csv('weatherOri.txt',sep = '|', index = False)
 df.to_csv('weatherOri.csv',sep = ',', index = False)
-df = pd.read_csv('weatherOri.csv' , sep=',', encoding='latin1')
 
+df = pd.read_csv('weatherOri.csv' , sep=',', encoding='latin1')
 col = pd.unique(df[df.columns[0]]).tolist()
 col.append('Location')
 col.append('Date')
@@ -114,23 +115,22 @@ for i in range(len(dateList)):
     dat = pd.DataFrame.from_dict(dat)
     dfNew = pd.concat([dfNew,dat])
 
+# Delete all noise attributes 
+del dfNew['DAPR']
+del dfNew['MDPR']
+del dfNew['SNWD']
+del dfNew['TOBS']
+del dfNew['WESD']
+del dfNew['WESF']
+del dfNew['WT01']
+del dfNew['WT03']
+del dfNew['WT04']
+del dfNew['WT06']
+del dfNew['WT11']
+
 dfNew.to_csv('weatherAfterMerge.txt',sep = '|', index = False)
 dfNew.to_csv('weatherAfterMerge.csv',sep = ',', index = False)
 
-dfNew = pd.read_csv('weatherAfterMerge.csv' , sep=',', encoding='latin1')
-## test number of missing values for attributes PRCP, SNOW, 
-## Tmax, Tmin(Tmax, Tmin are only for the first two locations)
-missVal= {}
-missVal['Date'] = dfNew['Date'].isnull().values.ravel().sum()
-missVal['PRCP'] = dfNew['PRCP'].isnull().values.ravel().sum()
-missVal['SNOW'] = dfNew['SNOW'].isnull().values.ravel().sum()
-missVal['TMIN'] = dfNew[dfNew['Location'] != 'US1VAFX0063']['TMIN'].isnull().values.ravel().sum()
-missVal['TMAX'] = dfNew[dfNew['Location'] != 'US1VAFX0063']['TMIN'].isnull().values.ravel().sum()
-## missVal:{'Date': 0, 'PRCP': 35, 'SNOW': 1495, 'TMAX': 24, 'TMIN': 24}
-
-noiseVal = {}
-## Check for noise values in Date. There are 365*3+366 = 1461 days in the four years 
-## and we can see if the number of unique values == 1461
-noiseVal['Date'] = len(pd.unique(dfNew['Date'])) - 1461
+            
 
 
