@@ -89,6 +89,12 @@ noiseDat['BICYCLISTSIMPAIRED'] = len(df[df['BICYCLISTSIMPAIRED']==1])
 
 noiseDat['PEDESTRIANSIMPAIRED'] = len(df[df['PEDESTRIANSIMPAIRED']==1])
 
+# Check for UNKNOWNINJURIES_BICYCLIST, UNKNOWNINJURIES_DRIVER and UNKNOWNINJURIES_PEDESTRIAN
+# we expect that the three attributes all have zero in them. Otherwise, they are 
+# considered as noise
+noiseDat['UNKNOWNINJURIES_BICYCLIST'] = len(df[df['UNKNOWNINJURIES_BICYCLIST']==1])
+noiseDat['UNKNOWNINJURIES_DRIVER'] = len(df[df['UNKNOWNINJURIES_DRIVER']==1])
+noiseDat['UNKNOWNINJURIES_PEDESTRIAN'] = len(df[df['UNKNOWNINJURIES_PEDESTRIAN']==1])
 
 # Then we check MAJORINJURIES_BICYCLIST,MINORINJURIES_BICYCLIST and FATAL_BICYCLIST
 # print(pd.unique(df['MAJORINJURIES_BICYCLIST']))
@@ -150,6 +156,8 @@ for i in range(len(df.index)):
         count = count +1
 noiseDat['TOTAL_VEHICLES'] =count
 
+# Check if sum of major, minior injuries, fatalities and unknowns <= number of 
+# pedestrians in the accident. If not then that record would be a noise value
 count = 0
 for i in range(len(df.index)):
     sumInjuries = df['MAJORINJURIES_PEDESTRIAN'].iloc[i]+df['MINORINJURIES_PEDESTRIAN'].iloc[i]
@@ -162,7 +170,8 @@ noiseDat['MINORINJURIES_PEDESTRIAN'] = count
 noiseDat['FATAL_PEDESTRIAN'] = count
 noiseDat['TOTAL_PEDESTRIANS'] = count
 
-# TOTAL_GOVERNMENT and TOTAL_TAXIS
+
+# TOTAL_GOVERNMENT and TOTAL_TAXIS must be <= total vehicles in an accident
 count = 0
 for i in range(len(df.index)):
     sumVehicle = df['TOTAL_GOVERNMENT'].iloc[i] + df['TOTAL_TAXIS'].iloc[i]
@@ -172,20 +181,17 @@ for i in range(len(df.index)):
 noiseDat['TOTAL_GOVERNMENT'] = count
 noiseDat['TOTAL_TAXIS'] = count
 
+# SPEEDING_INVOLVED indicates if the reporting officer believed speeding was a 
+# factor in the crash. This doesn't necessarily equate to participants being 
+# ticketed/cited for speeding. However we still expect that number of SPEEDING_INVOLVED
+# should not exceed number of vehicles.
+# This attribute will be fixed in the next part into a categorical 0,1 attribute 
 count = 0
 for i in range(len(df.index)):
     if (df['TOTAL_VEHICLES'].iloc[i] < df['SPEEDING_INVOLVED'].iloc[i]):
         count = count +1
-        
 noiseDat['SPEEDING_INVOLVED'] = count
 
-
-# Check for UNKNOWNINJURIES_BICYCLIST, UNKNOWNINJURIES_DRIVER and UNKNOWNINJURIES_PEDESTRIAN
-# we expect that the three attributes all have zero in them. Otherwise, they are 
-# considered as noise
-noiseDat['UNKNOWNINJURIES_BICYCLIST'] = len(df[df['UNKNOWNINJURIES_BICYCLIST']==1])
-noiseDat['UNKNOWNINJURIES_DRIVER'] = len(df[df['UNKNOWNINJURIES_DRIVER']==1])
-noiseDat['UNKNOWNINJURIES_PEDESTRIAN'] = len(df[df['UNKNOWNINJURIES_PEDESTRIAN']==1])
 
 # print(noiseDat)
 # noiseDat:{'ADDRESS': 58,'BICYCLISTSIMPAIRED': 7, 'FATAL_BICYCLIST': 0, 'FATAL_DRIVER': 16,

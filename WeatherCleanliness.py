@@ -24,6 +24,9 @@ noiseVal = {}
 ## Check for noise values in Date. There are 365*3+366 = 1461 days in the four years 
 ## and we can see if the number of unique values == 1461
 noiseVal['Date'] = len(pd.unique(dfNew['Date'])) - 1461
+# Check noise values in PRCE we define incorrect if the maximum - minimum for 
+# that day is more than 1 because it is very unlikely to have more than 1 inch
+# difference in raining
 count = 0
 dateList = pd.unique(dfNew['Date']).tolist()
 for i in range(len(dateList)):
@@ -32,6 +35,8 @@ for i in range(len(dateList)):
         count = count+1
 noiseVal['PRCP'] = count
 
+# Same for SNOW that noise values are defined if maximum - minimum snowing for 
+# that day is more than 2 inches
 count = 0
 for i in range(len(dateList)):
     date = dateList[i]
@@ -39,6 +44,9 @@ for i in range(len(dateList)):
         count = count+1
 noiseVal['SNOW'] = count
 
+# Check missing values in TMAX. We expect the temperature across different stations
+# in DC to be about the same. So if difference in max temperature across stations is
+# more than 10 degrees then it's likely to be incorrect 
 count = 0
 for i in range(len(dateList)):
     date = dateList[i]
@@ -46,6 +54,7 @@ for i in range(len(dateList)):
         count = count+1
 noiseVal['TMAX'] = count
 
+# Same for TMIN to identify noise values in TMIN
 count = 0
 for i in range(len(dateList)):
     date = dateList[i]
@@ -54,11 +63,14 @@ for i in range(len(dateList)):
 noiseVal['TMIN'] = count
 # noiseVal:{'Date': 0, 'PRCP': 21, 'SNOW': 6, 'TMAX': 47, 'TMIN': 29}
 
+# Get fraction of noise values. Since the noise values are in days for example
+# if maximum - minimum snowing for that day is too big then we define SNOW for 
+# that day is a noise value
 fracNoise = {}
 for i in noiseVal:
-    fracNoise[i] = noiseVal[i]/len(dfNew.index)
+    fracNoise[i] = noiseVal[i]/len(pd.unique(dfNew['Date']))
     
 # print(fracNoise)
-# fracNoise:{'Date': 0.0, 'PRCP': 0.00523168908819133, 'SNOW': 0.0014947683109118087,
-# 'TMAX': 0.011709018435475834, 'TMIN': 0.007224713502740409}
+# fracNoise:{'Date': 0.0, 'PRCP': 0.014373716632443531, 'SNOW': 0.004106776180698152,
+# 'TMAX': 0.03216974674880219, 'TMIN': 0.019849418206707735}
 # We can see that PRCP has the most noise values 

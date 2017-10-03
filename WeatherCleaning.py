@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+## The codes below will fix missing values and noise values in attributes 
+## "PRCP" and "SNOW'
 dfNew = pd.read_csv('weatherAfterMerge.csv' , sep=',', encoding='latin1')
 ## Fix snow missing data. If minimum temp > 32 then it's impossible to have snow
 snowNAList = dfNew[dfNew['SNOW'].isnull()].index.tolist()
@@ -19,6 +21,7 @@ for i in snowNAList:
 snowNAList = dfNew[dfNew['SNOW'].isnull()].index.tolist()
 for i in snowNAList:
     date = dfNew.iloc[i]['Date']
+    # check if there is at least one non missing SNOW data for that day
     if(not all(val is None for val in dfNew[dfNew['Date']==date]['SNOW'])):
         mean = np.mean(dfNew[dfNew['Date']==date]['SNOW'])
         dfNew.loc[i,'SNOW'] = mean
@@ -30,6 +33,9 @@ for i in snowNAList:
 dateList = pd.unique(dfNew['Date']).tolist()
 for i in range(len(dateList)):
     date = dateList[i]
+    # we define incorrect if the maximum - minimum for that day is more than 2
+    # because it is very unlikely to have more than 2 inches difference of snowing
+    # To fix it, we replace the value by taking mean for that day
     if((max(dfNew[dfNew['Date']==date]['SNOW']) - min(dfNew[dfNew['Date']==date]['SNOW']))>2):
         mean = np.mean(dfNew[dfNew['Date']==date]['SNOW'])
         dfNew.loc[dfNew['Date']==date,'SNOW'] = mean
@@ -49,9 +55,11 @@ for i in range(len(dateList)):
 PRCPNAList = dfNew[dfNew['PRCP'].isnull()].index.tolist()
 for i in PRCPNAList:
     date = dfNew.iloc[i]['Date']
+    # Same as SNOW, there must be at least one non missing for that day 
     if(not all(val is None for val in dfNew[dfNew['Date']==date]['PRCP'])):
         mean = np.mean(dfNew[dfNew['Date']==date]['PRCP'])
         dfNew.loc[i,'PRCP'] = mean
+        
 # print(dfNew['PRCP'].isnull().values.ravel().sum())
 # 4
 # Nuber of missing values reduces from 21 to 4 
@@ -74,6 +82,8 @@ for i in dfNew[dfNew['PRCP'].isnull()].index.tolist():
 dateList = pd.unique(dfNew['Date']).tolist()
 for i in range(len(dateList)):
     date = dateList[i]
+    # we define incorrect if the maximum - minimum for that day is more than 1
+    # because it is very unlikely to have more than 1 inches difference in raining
     if((max(dfNew[dfNew['Date']==date]['PRCP']) - min(dfNew[dfNew['Date']==date]['PRCP']))>1):
         mean = np.mean(dfNew[dfNew['Date']==date]['PRCP'])
         dfNew.loc[dfNew['Date']==date,'PRCP'] = mean
