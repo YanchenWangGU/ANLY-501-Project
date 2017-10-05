@@ -9,15 +9,15 @@ missVal['PRCP'] = dfNew['PRCP'].isnull().values.ravel().sum()
 missVal['SNOW'] = dfNew['SNOW'].isnull().values.ravel().sum()
 missVal['TMIN'] = dfNew[dfNew['Location'] != 'US1VAFX0063']['TMIN'].isnull().values.ravel().sum()
 missVal['TMAX'] = dfNew[dfNew['Location'] != 'US1VAFX0063']['TMIN'].isnull().values.ravel().sum()
-## missVal:{'Date': 0, 'PRCP': 35, 'SNOW': 1495, 'TMAX': 24, 'TMIN': 24}
+## missVal:{'Date': 0, 'PRCP': 35, 'SNOW': 1524, 'TMAX': 24, 'TMIN': 24}
 
 fracNa = {}
 for i in missVal:
     fracNa[i] = missVal[i]/len(dfNew.index)
 
 # print(fracNa)
-# fracNa:{'Date': 0.0, 'PRCP': 0.0087194818136522179, 'SNOW': 0.37244643746885897, 
-# 'TMIN': 0.0059790732436472349, 'TMAX': 0.0059790732436472349}
+# fracNa:{'Date': 0.0, 'PRCP': 0.0085303436509870829, 'SNOW': 0.37143553497440895, 
+# 'TMIN': 0.0058493785035339998, 'TMAX': 0.0058493785035339998}
 # SNOW has the most missing values 
 
 noiseVal = {}
@@ -54,7 +54,7 @@ for i in range(len(dateList)):
         count = count+1
 noiseVal['TMAX'] = count
 
-# Same for TMIN to identify noise values in TMIN
+# Same as TMAX to identify noise values in TMIN
 count = 0
 for i in range(len(dateList)):
     date = dateList[i]

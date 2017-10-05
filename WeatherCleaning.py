@@ -13,8 +13,8 @@ for i in snowNAList:
     
 ## see how it improves after replacing the missing values
 # print(dfNew['SNOW'].isnull().values.ravel().sum())
-# 243
-# This step reduces missing data from 1500 to 243
+# 257
+# This step reduces missing data from about 1500 to 257
         
 ## Replace rest of the missing values by taking mean of the snow data for that day
 ## Update missing value list
@@ -26,8 +26,8 @@ for i in snowNAList:
         mean = np.mean(dfNew[dfNew['Date']==date]['SNOW'])
         dfNew.loc[i,'SNOW'] = mean
 # print(dfNew['SNOW'].isnull().values.ravel().sum())
-# 10
-# The missing value reduced from about 1500 entries to 10 entries 
+# 3
+# The missing value reduced from about 1500 entries to 3 entries
 
 ## correct incorrect data in SNOW
 dateList = pd.unique(dfNew['Date']).tolist()
@@ -61,33 +61,20 @@ for i in PRCPNAList:
         dfNew.loc[i,'PRCP'] = mean
         
 # print(dfNew['PRCP'].isnull().values.ravel().sum())
-# 4
-# Nuber of missing values reduces from 21 to 4 
-# print(dfNew[dfNew['PRCP'].isnull()])
-#                     Date     Location  PRCP  SNOW  TMAX  TMIN
-#1091  2016-01-23T00:00:00  USC00186350   NaN  14.0  29.0  22.0
-#1092  2016-01-24T00:00:00  USC00186350   NaN  12.0  35.0  18.0
-#2525  2016-01-23T00:00:00  USC00182325   NaN  14.0  28.0  20.0
-#2526  2016-01-24T00:00:00  USC00182325   NaN  12.0  26.0  19.0
-
-# The days of the four missing values had heavy snow. We can replace the missing values
-# into 0 for those two days 
-for i in dfNew[dfNew['PRCP'].isnull()].index.tolist():
-    dfNew.loc[i,'PRCP'] = 0
-    
-# print(dfNew['PRCP'].isnull().values.ravel().sum())
-# 0 
+# 0
+# Nuber of missing values reduces from 21 to 40
     
 # Correct incorrect data in PRCP by taking mean PRCP for that day
 dateList = pd.unique(dfNew['Date']).tolist()
 for i in range(len(dateList)):
     date = dateList[i]
     # we define incorrect if the maximum - minimum for that day is more than 1
-    # because it is very unlikely to have more than 1 inches difference in raining
+    # because it is very unlikely to have more than 1 inche difference in raining
     if((max(dfNew[dfNew['Date']==date]['PRCP']) - min(dfNew[dfNew['Date']==date]['PRCP']))>1):
         mean = np.mean(dfNew[dfNew['Date']==date]['PRCP'])
         dfNew.loc[dfNew['Date']==date,'PRCP'] = mean
         
+# After cleaning, we check if there is any other incorrect values
 count = 0
 dateList = pd.unique(dfNew['Date']).tolist()
 for i in range(len(dateList)):
@@ -96,7 +83,7 @@ for i in range(len(dateList)):
         count = count+1
 # print(count)
 # 0
-# After fixing PRCP, the number of missing values and incorrect values reduces to zero
 
+# Save the cleaned dataset into files 
 dfNew.to_csv('weatherAfterCleaning.txt',sep = '|', index = False)
 dfNew.to_csv('weatherAfterCleaning.csv',sep = ',', index = False)

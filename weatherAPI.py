@@ -6,7 +6,8 @@ locList = list()
 locList.append('USC00186350')
 # Location at dalecavlia reservior
 locList.append('USC00182325')
-
+# location at Alexandra, VA. This station only contains PRCP and SNOW, no temperature data
+locList.append('US1VAFX0063')
 # Since the limit of results returned is 1000, we want to keep the each search 
 # period to 3 months so that the results won't exceed the limit
 dateList = list()
@@ -24,6 +25,7 @@ for i in range(len(yr)):
 # a new data frame to store data from API
 df = pd.DataFrame()
 for i in range(len(dateList)):
+    
     for k in range(len(locList)):
         BaseURL='https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&limit=1000&stationid=GHCND:'+locList[k]+'&units=standard&'+dateList[i]
         URLPost ={'token':'ekzgryaLzmqpLvYuHCERiUvLLGthmyJk'}
@@ -32,38 +34,14 @@ for i in range(len(dateList)):
         
         # For each result, it contains date, data type such as PRCP, SNOW, TMIN...
         # and its value 
-        for j in range(len(jsontxt['results'])):
-            date = jsontxt['results'][j]['date']
-            value = jsontxt['results'][j]['value']
-            datType = jsontxt['results'][j]['datatype']
-            val = {'Date': [date],'Value':[str(value)],'DataType':[datType],'Location':[locList[k]]}
-            dat = pd.DataFrame.from_dict(val)
-            df = pd.concat([df,dat])
-
-
-# This is the station id at alexandra, VA. This station only contains PRCP and SNOW
-# data, no data about temperature
-loc = 'US1VAFX0063'
-dateList = list()
-dateList.append('startdate=2013-07-08&enddate=2013-12-31')
-dateList.append('startdate=2014-01-31&enddate=2014-06-30')
-dateList.append('startdate=2014-07-01&enddate=2014-12-31')
-dateList.append('startdate=2015-01-31&enddate=2015-06-30')
-dateList.append('startdate=2015-07-01&enddate=2015-12-31')
-dateList.append('startdate=2016-01-31&enddate=2016-06-30')
-dateList.append('startdate=2016-07-01&enddate=2016-12-31')
-for i in range(len(dateList)):
-    BaseURL='https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&limit=1000&stationid=GHCND:'+loc+'&units=standard&'+dateList[i]
-    URLPost ={'token':'ekzgryaLzmqpLvYuHCERiUvLLGthmyJk'}
-    response=requests.get(BaseURL,headers =URLPost)
-    jsontxt = response.json()
-    for j in range(len(jsontxt['results'])):
-        date = jsontxt['results'][j]['date']
-        value = jsontxt['results'][j]['value']
-        datType = jsontxt['results'][j]['datatype']
-        val = {'Date': [date],'Value':[str(value)],'DataType':[datType],'Location':[loc]}
-        dat = pd.DataFrame.from_dict(val)
-        df = pd.concat([df,dat])
+        if (len(jsontxt) !=0):
+            for j in range(len(jsontxt['results'])):
+                date = jsontxt['results'][j]['date']
+                value = jsontxt['results'][j]['value']
+                datType = jsontxt['results'][j]['datatype']
+                val = {'Date': [date],'Value':[str(value)],'DataType':[datType],'Location':[locList[k]]}
+                dat = pd.DataFrame.from_dict(val)
+                df = pd.concat([df,dat])
         
 # Store the data scraped using API into files 
 df.to_csv('weatherOri.txt',sep = '|', index = False)
