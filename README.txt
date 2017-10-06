@@ -18,3 +18,4 @@ weatherAfterMerge.txt and weatherAfterMerge.csv are data files after merging ite
 
 weatherOri.txt and weatherOri.csv are original data files using API.
 
+ANLY501 Project Assignment1 contains all text for all questions 
